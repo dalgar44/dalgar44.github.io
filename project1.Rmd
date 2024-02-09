@@ -1,0 +1,91 @@
+---
+title: "R Markdown and Leaflet Project"
+author: "Michael Harry"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+
+library(leaflet)
+```
+
+```{r, echo=FALSE}
+date <- format(Sys.Date()[1], "%B %d, %Y")[1][1]
+```
+## February 9, 2024
+
+```{r, echo=FALSE}
+pharm_loc <- read.csv("./NC_Pharmacies.csv")
+pharm_loc <- pharm_loc[pharm_loc$USER_STATE == "NC",]
+pharm_loc$latitude <- pharm_loc$Y
+pharm_loc$longitude <- pharm_loc$X
+pharm_loc <- pharm_loc[!is.na(pharm_loc$latitude),]
+
+
+cvs <- pharm_loc[startsWith(pharm_loc$USER_DBA, "CVS"),]
+cvs <- cvs[1:50,]
+wal <- pharm_loc[startsWith(pharm_loc$USER_DBA, "Walgreen"),]
+wal <- wal[1:50,]
+
+ffr <- read.csv("./Fast_Food_Restaurants_US.csv")
+ffr <- ffr[ffr$province==c("NC"),]
+ffr <- ffr[ffr$name==c("McDonald's", "Burger King", "Taco Bell"),]
+
+my_icons <- iconList(
+  "McDonald's" = makeIcon(
+    iconUrl = "https://cdn-icons-png.flaticon.com/512/5977/5977588.png",
+    iconWidth = 31*215/230, iconHeight = 31,
+    iconAnchorX = 31*215/230/2, iconAnchorY = 16
+  ),
+  "Burger King" = makeIcon(
+    iconUrl = "https://cdn.freebiesupply.com/images/large/2x/burger-king-logo-png-transparent.png",
+    iconWidth = 31*215/230, iconHeight = 31,
+    iconAnchorX = 31*215/230/2, iconAnchorY = 16
+  ),
+  "Taco Bell" = makeIcon(
+    iconUrl = "https://banner2.cleanpng.com/20181130/zrr/kisspng-logo-taco-bell-hot-dog-american-cuisine-promotions-san-antonio-spurs-5c01dbcaa46d97.6332635915436256746735.jpg",
+    iconWidth = 31*215/230, iconHeight = 31,
+    iconAnchorX = 31*215/230/2, iconAnchorY = 16
+  )
+)
+
+cvs_icon = makeIcon(iconUrl = "https://goldenharvest.org/wp-content/uploads/2020/01/cvs-pharmacy-logo-brand-cvs-health-font-png-favpng-wxjA4NU0StS5QERTpaQwNGUQG.jpg",
+                    iconWidth = 31*215/230, iconHeight = 31,
+                    iconAnchorX = 31*215/230/2, iconAnchorY = 16)
+
+wal_icon = makeIcon(iconUrl = "https://banner2.cleanpng.com/20180612/plu/kisspng-walgreens-pharmacy-logo-rite-aid-pharmacy-store-5b202ecf426254.2892272715288357912719.jpg",
+                    iconWidth = 31*215/230, iconHeight = 31,
+                    iconAnchorX = 31*215/230/2, iconAnchorY = 16)
+
+#leaflet(cvs) %>%
+#  addTiles() %>%
+#  addMarkers(
+#    data=cvs,
+#    lat = ~latitude,
+#    lng = ~longitude,
+#    popup = paste(cvs$USER_DBA, "\n", cvs$USER_CITY, ", ", cvs$USER_STATE),
+#    icon = ~cvs_icon
+#  )
+
+#leaflet(wal) %>%
+#  addTiles() %>%
+#  addMarkers(
+#    data=wal,
+#    lat = ~latitude,
+#    lng = ~longitude,
+#    popup = paste(cvs$USER_DBA, "\n", cvs$USER_CITY, ", ", cvs$USER_STATE),
+#    icon = ~wal_icon
+#  )
+
+leaflet(ffr) %>% 
+  addTiles() %>% 
+  addMarkers(
+    data = ffr, 
+    lat = ~latitude, 
+    lng = ~longitude,
+    popup = paste(ffr$name, "\n", ffr$city, ", ", ffr$province),
+    icon = ~my_icons[ffr$name]
+  )
+
+```
