@@ -1,0 +1,31 @@
+---
+title: "R Markdown and Plotly Project"
+author: "Michael Harry"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+
+library(plotly)
+```
+
+```{r, echo=FALSE}
+date <- format(Sys.Date()[1], "%B %d, %Y")[1][1]
+
+dia <- read.csv("./diabetes_prediction_dataset.csv")
+dia$diabetes <- as.factor(dia$diabetes)
+levels(dia$diabetes) <- c("Non-diabetic", "Diabetic")
+```
+## February 9, 2024
+
+```{r, echo=FALSE, fig.height=5}
+fig <- plot_ly(data=dia, x=~age, y=~bmi, z=~HbA1c_level, type="scatter3d",
+               mode="markers",
+               color=~diabetes, colors = c('#099F00','#BF382A')) %>%
+       add_markers() %>%
+       layout(scene = list(xaxis = list(title = 'Age'),
+                           yaxis = list(title = 'BMI'),
+                           zaxis = list(title = 'A1C Level')))
+fig
+```
